@@ -1,0 +1,60 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input DeleteTodoInput {
+  id: Float!
+}
+
+type Mutation {
+  createTodo(data: UpdateDataInput!): TodoOutput!
+  deleteTodo(where: DeleteTodoInput!): TodoOutput!
+  updateTodo(params: UpdateTodoInput!): TodoOutput!
+}
+
+type Query {
+  getTodo(id: Int!): TodoOutput!
+  getTodos: [TodoOutput!]!
+  getTodosByStatus(status: TodoStatus!): [TodoOutput!]!
+}
+
+input Todo {
+  description: String!
+  expires: Int!
+  id: Int!
+  isCompleted: Boolean!
+  name: String!
+  status: TodoStatus!
+}
+
+type TodoOutput {
+  description: String!
+  expires: Int!
+  id: Int!
+  isCompleted: Boolean!
+  name: String!
+  status: TodoStatus!
+}
+
+enum TodoStatus {
+  COMPLETED
+  INPROGRESS
+  PENDING
+}
+
+input UpdateDataInput {
+  description: String!
+  expires: Int!
+  isCompleted: Boolean!
+  name: String!
+  status: TodoStatus!
+}
+
+input UpdateTodoInput {
+  data: UpdateDataInput!
+  where: WhereInput!
+}
+
+input WhereInput {
+  id: Float!
+}
