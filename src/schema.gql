@@ -43,11 +43,11 @@ enum TodoStatus {
 }
 
 input UpdateDataInput {
-  description: String!
-  expires: Int!
-  isCompleted: Boolean!
-  name: String!
-  status: TodoStatus!
+  description: String
+  expires: Int
+  isCompleted: Boolean
+  name: String
+  status: TodoStatus
 }
 
 input UpdateTodoInput {
