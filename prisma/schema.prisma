@@ -17,10 +17,16 @@ enum Status {
 }
 
 model Todo {
-  id Int @default(autoincrement()) @id
-  name String
+  id          Int     @id @default(autoincrement())
+  name        String
   description String
-  expires Int
+  expires     Int
   isCompleted Boolean
-  status Status
+  status      Status
+}
+
+model Resources {
+  userId     String
+  cdnBucket  String 
+  resourceId String @id
 }

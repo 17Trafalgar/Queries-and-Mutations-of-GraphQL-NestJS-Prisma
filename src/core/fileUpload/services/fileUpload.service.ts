@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import axios, { AxiosRequestConfig } from 'axios';
 
 import { PrismaService } from 'src/database/prisma.service';
+import { ResponseFileSource } from '../types/fileUpload.types';
 
 @Injectable()
 export class FileUploadService {
@@ -10,25 +11,26 @@ export class FileUploadService {
   async uploadFormDataInToCDN(
     baseUrl: string,
     bucket: string,
-    data: FormData,
-  ): Promise<Response> {
+    formData: FormData,
+  ): Promise<ResponseFileSource> {
     const url = baseUrl + '/' + bucket;
 
     const opts: AxiosRequestConfig = {
       method: 'POST',
       url,
-      data,
+      data: formData,
       headers: {
-        ...data.getHeaders(),
+        ...formData.getHeaders(),
         // 'Authorization': req.headers['authorization'],
       },
     };
 
-    return new Promise<Response>((resolve, reject) =>
-      axios<Response>(opts)
-        .then(({ data }) => resolve(data))
-        .catch((er) => reject(er)),
-    );
+    try {
+      const { data } = await axios<ResponseFileSource>(opts);
+      return data;
+    } catch (er) {
+      throw er;
+    }
   }
 
   async uploadDataInToDB(
@@ -49,7 +51,6 @@ export class FileUploadService {
   async deleteDataInToDB(cdnBucket: string, resourceId: string) {
     return await this.prisma.resources.delete({
       where: {
-        cdnBucket,
         resourceId,
       },
     });

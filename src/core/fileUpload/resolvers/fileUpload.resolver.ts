@@ -4,20 +4,17 @@ import { FileUploadService } from '../services/fileUpload.service';
 import GraphQLUpload from 'graphql-upload/GraphQLUpload';
 import axios from 'axios';
 import { IUpload } from '../interfaces/upload.interface';
+import { Stream } from 'stream';
+import { ResponseFileSource } from '../types/fileUpload.types';
 
-function streamBuffering(stream) {
+async function streamBuffering(stream: Stream): Promise<string> {
   const chunks = [];
   return new Promise((resolve, reject) => {
     stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
     stream.on('error', (err) => reject(err));
-    stream.on('end', () => resolve(Buffer.concat(chunks)));
+    stream.on('end', () => resolve(Buffer.concat(chunks).toString()));
   });
 }
-
-type ResponseFileSource = {
-  urls: string[];
-  ids: string[];
-};
 
 @Resolver()
 export class FileResolver {
@@ -36,14 +33,13 @@ export class FileResolver {
     const cdnUrl = 'https://';
     const cdnBucket = 'site-content';
 
-    const resource =
-      await this.FUService.uploadFormDataInToCDN<ResponseFileSource>(
-        cdnUrl,
-        cdnBucket,
-        data,
-      );
+    const resource = await this.FUService.uploadFormDataInToCDN(
+      cdnUrl,
+      cdnBucket,
+      data,
+    );
     if (!resource.ids.length)
-      throw new GqlHttpException(
+      throw new console.error(
         `File wasn't uploaded correctly`,
         HttpStatus.SERVICE_UNAVAILABLE,
       );
@@ -59,7 +55,7 @@ export class FileResolver {
         .then(() => res(resource))
         .catch(() =>
           rej(
-            new GqlHttpException(
+            new console.error(
               `File wasn't saved correctly`,
               HttpStatus.SERVICE_UNAVAILABLE,
             ),
@@ -88,16 +84,12 @@ export class FileResolver {
     }
 
     // uploads files into CDN and receives resources
-    const resources =
-      await this.FUService.uploadFormDataInToCDN<ResponseFileSource>(
-        cdnUrl,
-        cdnBucket,
-        formData,
-      );
+    const resources: ResponseFileSource =
+      await this.FUService.uploadFormDataInToCDN(cdnUrl, cdnBucket, formData);
     console.log('CDN Response:', resources);
     // Throws an error if not all required files were uploaded successfully
     if (resources.ids.length !== files.length)
-      throw new GqlHttpException(
+      throw new console.error(
         `Files weren't uploaded correctly`,
         HttpStatus.EXPECTATION_FAILED,
       );
@@ -111,7 +103,7 @@ export class FileResolver {
         .then(res)
         .catch(() =>
           rej(
-            new GqlHttpException(
+            new console.error(
               `Files weren't saved correctly`,
               HttpStatus.EXPECTATION_FAILED,
             ),
@@ -142,7 +134,7 @@ export class FileResolver {
         .then(() => resolve(true))
         .catch(() =>
           reject(
-            new GqlHttpException(
+            new console.error(
               `Files weren't deleted correctly`,
               HttpStatus.EXPECTATION_FAILED,
             ),
