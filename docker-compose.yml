@@ -1,0 +1,23 @@
+version: '3.5'
+
+services:
+#  backend:
+#    build: .
+#    depends_on:
+#      - db
+
+  postgres:
+    container_name: dbIgorV
+    image: postgres:15-alpine
+    volumes:
+      - postgres-db:/data/postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: admin
+      PGDATA: /data/postgres
+
+
+volumes:
+  postgres-db:
