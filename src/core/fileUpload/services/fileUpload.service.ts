@@ -17,15 +17,15 @@ export class FileUploadService {
 
     const headers = formData.getHeaders();
     // headers['Authorization'] = req.headers['authorization'];
-  
+
     try {
       const response = await fetch(url, {
         method: 'POST',
         body: formData,
-        headers
+        headers,
       });
-  
-      const data = await response.json();
+
+      const data: ResponseFileSource = await response.json();
       return data;
     } catch (er) {
       throw er;
