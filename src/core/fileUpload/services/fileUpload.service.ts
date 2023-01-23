@@ -15,18 +15,17 @@ export class FileUploadService {
   ): Promise<ResponseFileSource> {
     const url = baseUrl + '/' + bucket;
 
-    const opts: AxiosRequestConfig = {
-      method: 'POST',
-      url,
-      data: formData,
-      headers: {
-        ...formData.getHeaders(),
-        // 'Authorization': req.headers['authorization'],
-      },
-    };
-
+    const headers = formData.getHeaders();
+    // headers['Authorization'] = req.headers['authorization'];
+  
     try {
-      const { data } = await axios<ResponseFileSource>(opts);
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers
+      });
+  
+      const data = await response.json();
       return data;
     } catch (er) {
       throw er;
