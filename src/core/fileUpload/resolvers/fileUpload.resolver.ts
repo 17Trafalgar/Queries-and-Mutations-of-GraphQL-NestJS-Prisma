@@ -1,7 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 import { Mutation, Resolver, Args } from '@nestjs/graphql';
 import { FileUploadService } from '../services/fileUpload.service';
-import GraphQLUpload from 'graphql-upload/GraphQLUpload';
+import { GraphQLUpload } from 'graphql-upload';
 import axios from 'axios';
 import { IUpload } from '../interfaces/upload.interface';
 import { Stream } from 'stream';
@@ -122,6 +122,7 @@ export class FileResolver {
       resourceURL.startsWith(protocol) ? resourceURL : protocol + resourceURL,
     );
     const [cdnBucket, resourceId] = url.pathname.split('/');
+
 
     const deletingFromCDN = axios.delete(url.href);
     const deletingFromDB = await this.FUService.deleteDataInToDB(

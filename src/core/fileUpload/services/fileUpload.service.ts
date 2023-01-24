@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import axios, { AxiosRequestConfig } from 'axios';
-
 import { PrismaService } from 'src/database/prisma.service';
 import { ResponseFileSource } from '../types/fileUpload.types';
 
@@ -15,14 +13,13 @@ export class FileUploadService {
   ): Promise<ResponseFileSource> {
     const url = baseUrl + '/' + bucket;
 
-    const headers = formData.getHeaders();
+    /* const headers = formData.getHeaders(); */
     // headers['Authorization'] = req.headers['authorization'];
 
     try {
       const response = await fetch(url, {
         method: 'POST',
         body: formData,
-        headers,
       });
 
       const data: ResponseFileSource = await response.json();
