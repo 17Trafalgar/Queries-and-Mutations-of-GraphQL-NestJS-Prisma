@@ -1,10 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { createWriteStream } from 'fs';
 import { PrismaService } from 'src/database/prisma.service';
-import { ResponseFileSource } from '../types/fileUpload.types';
+import { CreateFileInput, Resources, ResponseFileSource } from '../types/fileUpload.types';
 
 @Injectable()
 export class FileUploadService {
   constructor(private prisma: PrismaService) {}
+
+  async createFile({ file }: CreateFileInput): Promise<Resources> {
+    const { createReadStream, filename } = file;
+    try {
+      await new Promise((resolve, reject) =>
+        createReadStream()
+          .pipe(createWriteStream(`./uploads/${filename}`))
+          .on('finish', resolve)
+          .on('error', reject),
+      );
+      return await this.uploadDataInToDB(
+        'userId',
+        `./uploads/${filename}`,
+        '653464365',
+      );
+    } catch (error) {
+      throw new HttpException('Could not save image', HttpStatus.BAD_REQUEST);
+    }
+  }
 
   async uploadFormDataInToCDN(
     baseUrl: string,

@@ -8,14 +8,23 @@ input DeleteTodoInput {
 
 type Mutation {
   createTodo(data: UpdateDataInput!): TodoOutput!
+  deleteFile(url: String!): Boolean!
   deleteTodo(where: DeleteTodoInput!): TodoOutput!
   updateTodo(params: UpdateTodoInput!): TodoOutput!
+  uploadFile(file: Upload!): ResourcesOutput!
+  uploadFiles(files: [Upload!]!): Upload!
 }
 
 type Query {
   getTodo(id: Int!): TodoOutput!
   getTodos: [TodoOutput!]!
   getTodosByStatus(status: TodoStatus!): [TodoOutput!]!
+}
+
+type ResourcesOutput {
+  cdnBucket: String!
+  resourceId: String!
+  userId: String!
 }
 
 input Todo {
@@ -54,6 +63,9 @@ input UpdateTodoInput {
   data: UpdateDataInput!
   where: WhereInput!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input WhereInput {
   id: Float!

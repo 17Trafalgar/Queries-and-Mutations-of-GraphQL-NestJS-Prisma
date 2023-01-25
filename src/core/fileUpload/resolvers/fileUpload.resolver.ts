@@ -5,7 +5,8 @@ import { GraphQLUpload } from 'graphql-upload';
 import axios from 'axios';
 import { IUpload } from '../interfaces/upload.interface';
 import { Stream } from 'stream';
-import { ResponseFileSource } from '../types/fileUpload.types';
+import { Resources, ResponseFileSource } from '../types/fileUpload.types';
+
 
 async function streamBuffering(stream: Stream): Promise<string> {
   const chunks = [];
@@ -20,51 +21,49 @@ async function streamBuffering(stream: Stream): Promise<string> {
 export class FileResolver {
   constructor(private readonly FUService: FileUploadService) {}
 
-  @Mutation(() => File)
+  @Mutation(() => Resources)
+  async uploadFile(
+    @Args({ name: 'file', type: () => GraphQLUpload })
+    file: IUpload,
+  ): Promise<any> {
+    return this.FUService.createFile({ file });
+  }
+
+  /* @Mutation(() => Boolean)
   async uploadFile(
     @Args({ name: 'file', type: () => GraphQLUpload }) file: IUpload,
   ) {
     const { filename, createReadStream } = file;
     const bf = await streamBuffering(createReadStream());
-
     const data = new FormData();
     data.append('file', bf, filename);
 
     const cdnUrl = 'https://';
     const cdnBucket = 'site-content';
 
-    const resource = await this.FUService.uploadFormDataInToCDN(
-      cdnUrl,
-      cdnBucket,
-      data,
-    );
-    if (!resource.ids.length)
-      throw new console.error(
-        `File wasn't uploaded correctly`,
-        HttpStatus.SERVICE_UNAVAILABLE,
+    try {
+      const resource = await this.FUService.uploadFormDataInToCDN(
+        cdnUrl,
+        cdnBucket,
+        data,
+      );
+      if (!resource.ids.length)
+        throw new Error(`File wasn't uploaded correctly`);
+
+      const uploadProcess = await this.FUService.uploadDataInToDB(
+        'userID',
+        cdnBucket,
+        "",
       );
 
-    const uploadProcess = this.FUService.uploadDataInToDB(
-      'userID',
-      cdnBucket,
-      resource.ids[0],
-    );
+      return uploadProcess;
+    } catch (error) {
+      console.error(error);
+      throw new Error(`File wasn't saved correctly`);
+    }
+  } */
 
-    return new Promise((res, rej) => {
-      uploadProcess
-        .then(() => res(resource))
-        .catch(() =>
-          rej(
-            new console.error(
-              `File wasn't saved correctly`,
-              HttpStatus.SERVICE_UNAVAILABLE,
-            ),
-          ),
-        );
-    });
-  }
-
-  @Mutation(() => File)
+  @Mutation(() => GraphQLUpload)
   async uploadFiles(
     @Args('files', { type: () => [GraphQLUpload] })
     fileList: Promise<IUpload>[],
@@ -122,7 +121,6 @@ export class FileResolver {
       resourceURL.startsWith(protocol) ? resourceURL : protocol + resourceURL,
     );
     const [cdnBucket, resourceId] = url.pathname.split('/');
-
 
     const deletingFromCDN = axios.delete(url.href);
     const deletingFromDB = await this.FUService.deleteDataInToDB(

@@ -4,6 +4,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 
 import { TodoModule } from './core/todos/todo.module';
+import { FileUploadModule } from './core/fileUpload/fileUpload.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TodoModule } from './core/todos/todo.module';
       playground: true,
     }),
     TodoModule,
+    FileUploadModule,
   ],
 })
 export class AppModule {}
