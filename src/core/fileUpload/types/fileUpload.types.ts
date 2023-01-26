@@ -24,3 +24,4 @@ export class Resources {
   @Field(() => String)
   resourceId: string;
 }
+

@@ -1,11 +1,20 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { createWriteStream } from 'fs';
 import { PrismaService } from 'src/database/prisma.service';
-import { CreateFileInput, Resources, ResponseFileSource } from '../types/fileUpload.types';
+import {
+  CreateFileInput,
+  Resources,
+  ResponseFileSource,
+} from '../types/fileUpload.types';
 
 @Injectable()
 export class FileUploadService {
   constructor(private prisma: PrismaService) {}
+
+   randomNum(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min; // You can remove the Math.floor if you don't want it to be an integer
+  }
+
 
   async createFile({ file }: CreateFileInput): Promise<Resources> {
     const { createReadStream, filename } = file;
@@ -19,10 +28,10 @@ export class FileUploadService {
       return await this.uploadDataInToDB(
         'userId',
         `./uploads/${filename}`,
-        '653464365',
+        filename,
       );
     } catch (error) {
-      throw new HttpException('Could not save image', HttpStatus.BAD_REQUEST);
+      throw new HttpException(`Could not save image, ${error.message}`, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -64,7 +73,7 @@ export class FileUploadService {
     });
   }
 
-  async deleteDataInToDB(cdnBucket: string, resourceId: string) {
+  async deleteDataInToDB(resourceId: string) {
     return await this.prisma.resources.delete({
       where: {
         resourceId,

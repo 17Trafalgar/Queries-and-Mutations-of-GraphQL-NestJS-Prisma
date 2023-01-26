@@ -3,10 +3,10 @@ import { Mutation, Resolver, Args } from '@nestjs/graphql';
 import { FileUploadService } from '../services/fileUpload.service';
 import { GraphQLUpload } from 'graphql-upload';
 import axios from 'axios';
-import { IUpload } from '../interfaces/upload.interface';
+import { FileUploadDto, IUpload } from '../interfaces/upload.interface';
 import { Stream } from 'stream';
 import { Resources, ResponseFileSource } from '../types/fileUpload.types';
-
+import { IsMimeType } from 'class-validator';
 
 async function streamBuffering(stream: Stream): Promise<string> {
   const chunks = [];
@@ -24,9 +24,14 @@ export class FileResolver {
   @Mutation(() => Resources)
   async uploadFile(
     @Args({ name: 'file', type: () => GraphQLUpload })
-    file: IUpload,
+    file: FileUploadDto,
   ): Promise<any> {
-    return this.FUService.createFile({ file });
+    const { mimetype } = file;
+    if (mimetype.match(/^image\/(jpeg|gif)$/)) {
+      return this.FUService.createFile({ file });
+    } else {
+      throw new Error(`File wasn't mime(${mimetype}) type correctly`);
+    }
   }
 
   /* @Mutation(() => Boolean)
@@ -63,12 +68,17 @@ export class FileResolver {
     }
   } */
 
-  @Mutation(() => GraphQLUpload)
+  @Mutation(() => [Resources])
   async uploadFiles(
     @Args('files', { type: () => [GraphQLUpload] })
-    fileList: Promise<IUpload>[],
-  ) {
-    const files: IUpload[] = await Promise.all(fileList);
+    fileList: FileUploadDto[],
+  ): Promise<FileUploadDto[]> {
+    const files = [];
+    (await Promise.all(fileList)).forEach((file) => {
+      files.push(this.FUService.createFile({ file }));
+    });
+    return files;
+    /*     const files: IUpload[] = await Promise.all(fileList);
     const formData = new FormData();
 
     const cdnUrl = 'https:';
@@ -108,27 +118,24 @@ export class FileResolver {
             ),
           ),
         );
-    });
+    }); */
   }
 
   @Mutation(() => Boolean)
   async deleteFile(
     @Args('url', { type: () => String })
-    resourceURL: string,
+    resourceId: string,
   ) {
-    const protocol = 'https://';
+    /*     const protocol = 'https://';
     const url = new URL(
       resourceURL.startsWith(protocol) ? resourceURL : protocol + resourceURL,
     );
     const [cdnBucket, resourceId] = url.pathname.split('/');
 
-    const deletingFromCDN = axios.delete(url.href);
-    const deletingFromDB = await this.FUService.deleteDataInToDB(
-      cdnBucket,
-      resourceId,
-    );
-
-    return new Promise((resolve, reject) => {
+    const deletingFromCDN = axios.delete(url.href); */
+    const deletingFromDB = await this.FUService.deleteDataInToDB(resourceId);
+    return true;
+    /*     return new Promise((resolve, reject) => {
       Promise.all([deletingFromCDN, deletingFromDB])
         .then(() => resolve(true))
         .catch(() =>
@@ -139,6 +146,6 @@ export class FileResolver {
             ),
           ),
         );
-    });
+    }); */
   }
 }

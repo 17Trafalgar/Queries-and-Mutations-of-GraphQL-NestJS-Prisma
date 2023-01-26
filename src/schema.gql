@@ -12,7 +12,7 @@ type Mutation {
   deleteTodo(where: DeleteTodoInput!): TodoOutput!
   updateTodo(params: UpdateTodoInput!): TodoOutput!
   uploadFile(file: Upload!): ResourcesOutput!
-  uploadFiles(files: [Upload!]!): Upload!
+  uploadFiles(files: [Upload!]!): [ResourcesOutput!]!
 }
 
 type Query {
