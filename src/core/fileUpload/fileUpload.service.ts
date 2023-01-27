@@ -1,56 +1,78 @@
-import { Injectable } from '@nestjs/common';
-import axios, { AxiosRequestConfig } from 'axios';
-import { PrismaService } from '../../database/prisma.service';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { createWriteStream } from 'fs';
+import { PrismaService } from 'src/database/prisma.service';
+import {
+  CreateFileInput,
+  Resources,
+} from '../fileUpload/InputFileUpload/fileupload.model';
+import { ResponseFileSource } from '../fileUpload/interfaces/upload.interface';
 
-// @Injectable()
-// export class FileUploadService {
-//   constructor(private prisma: PrismaService) {}
+@Injectable()
+export class FileUploadService {
+  constructor(private prisma: PrismaService) {}
 
-//   async uploadFormDataInToCDN(
-//     baseUrl: string,
-//     bucket: string,
-//     data: FormData,
-//   ): Promise<Response> {
-//     const url = baseUrl + '/' + bucket;
+  async createFile({ file }: CreateFileInput): Promise<Resources> {
+    const { createReadStream, filename } = file;
+    try {
+      await new Promise((resolve, reject) =>
+        createReadStream()
+          .pipe(createWriteStream(`./uploads/${filename}`))
+          .on('finish', resolve)
+          .on('error', reject),
+      );
+      return await this.uploadDataInToDB(
+        'userId',
+        `./uploads/${filename}`,
+        '653464365',
+      );
+    } catch (error) {
+      throw new HttpException('Could not save image', HttpStatus.BAD_REQUEST);
+    }
+  }
 
-//     const opts: AxiosRequestConfig = {
-//       method: 'POST',
-//       url,
-//       data,
-//       headers: {
-//         ...data.getHeaders(),
-//         // 'Authorization': req.headers['authorization'],
-//       },
-//     };
+  async uploadFormDataInToCDN(
+    baseUrl: string,
+    bucket: string,
+    formData: FormData,
+  ): Promise<ResponseFileSource> {
+    const url = baseUrl + '/' + bucket;
 
-//     return new Promise<Response>((resolve, reject) =>
-//       axios<Response>(opts)
-//         .then(({ data }) => resolve(data))
-//         .catch((er) => reject(er)),
-//     );
-//   }
+    /* const headers = formData.getHeaders(); */
+    // headers['Authorization'] = req.headers['authorization'];
 
-//   async uploadDataInToDB(
-//     userId: string,
-//     cdnBucket: string,
-//     resourceId: string,
-//   ) {
-//     console.log('uploading into db');
-//     return this.prisma.resources.create({
-//       data: {
-//         userId,
-//         cdnBucket,
-//         resourceId,
-//       },
-//     });
-//   }
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData,
+      });
 
-//   async deleteDataInToDB(cdnBucket: string, resourceId: string) {
-//     return await this.prisma.resources.delete({
-//       where: {
-//         cdnBucket,
-//         resourceId,
-//       },
-//     });
-//   }
-// }
+      const data: ResponseFileSource = await response.json();
+      return data;
+    } catch (er) {
+      throw er;
+    }
+  }
+
+  async uploadDataInToDB(
+    userId: string,
+    cdnBucket: string,
+    resourceId: string,
+  ) {
+    console.log('uploading into db');
+    return this.prisma.resources.create({
+      data: {
+        userId,
+        cdnBucket,
+        resourceId,
+      },
+    });
+  }
+
+  async deleteDataInToDB(resourceId: string) {
+    return await this.prisma.resources.delete({
+      where: {
+        resourceId,
+      },
+    });
+  }
+}

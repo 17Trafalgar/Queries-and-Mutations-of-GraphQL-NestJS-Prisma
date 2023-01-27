@@ -24,3 +24,8 @@ model Todo {
   isCompleted Boolean
   status Status
 }
+model Resources {
+  userId     String
+  cdnBucket  String 
+  resourceId String @id
+}
