@@ -1,12 +1,9 @@
-import { HttpStatus } from '@nestjs/common';
 import { Mutation, Resolver, Args } from '@nestjs/graphql';
 import { FileUploadService } from '../services/fileUpload.service';
 import { GraphQLUpload } from 'graphql-upload';
-import axios from 'axios';
-import { FileUploadDto, IUpload } from '../interfaces/upload.interface';
+import { FileUploadDto } from '../interfaces/upload.interface';
 import { Stream } from 'stream';
-import { Resources, ResponseFileSource } from '../types/fileUpload.types';
-import { IsMimeType } from 'class-validator';
+import { Resources } from '../types/fileUpload.types';
 
 async function streamBuffering(stream: Stream): Promise<string> {
   const chunks = [];

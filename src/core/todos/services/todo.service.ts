@@ -1,10 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { Prisma, Status, Todo } from "@prisma/client";
-import { PrismaService } from "src/database/prisma.service";
+import { Injectable } from '@nestjs/common';
+import { Prisma, Status, Todo } from '@prisma/client';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
 export class TodoService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async findOne(id: number): Promise<Todo | null> {
     return this.prisma.todo.findUnique({

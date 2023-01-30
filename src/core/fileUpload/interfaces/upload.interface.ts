@@ -1,6 +1,7 @@
-import { ArrayContains, Contains, IsMimeType, IsString } from 'class-validator';
+import { Contains, IsString } from 'class-validator';
 import { ReadStream } from 'fs';
 import { Stream } from 'stream';
+
 export interface IUpload {
   filename: string;
   mimetype: string;

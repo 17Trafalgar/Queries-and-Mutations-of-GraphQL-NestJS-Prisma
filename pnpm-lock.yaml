@@ -27,6 +27,7 @@ specifiers:
   graphql: ^16.6.0
   graphql-upload: ^12.0.0
   jest: 29.3.1
+  pnpm: ^7.26.1
   prettier: ^2.3.2
   prisma: ^4.8.1
   reflect-metadata: ^0.1.13
@@ -53,6 +54,7 @@ dependencies:
   class-validator: 0.14.0
   graphql: 16.6.0
   graphql-upload: 12.0.0_graphql@16.6.0
+  pnpm: 7.26.1
   reflect-metadata: 0.1.13
   rxjs: 7.8.0
 
@@ -4619,6 +4621,12 @@ packages:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
     dev: true
+
+  /pnpm/7.26.1:
+    resolution: {integrity: sha512-l86ZNy8RZmG2aDxZVk6+vt9c8aV0tMZICQxPksRQOL5r2n92kgaIauYSFUZ+LNmPJFsbSGKpsvgOF41oiS7JWw==}
+    engines: {node: '>=14.6'}
+    hasBin: true
+    dev: false
 
   /prelude-ls/1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}

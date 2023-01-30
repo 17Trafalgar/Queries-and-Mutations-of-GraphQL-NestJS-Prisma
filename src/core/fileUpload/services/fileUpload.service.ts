@@ -11,10 +11,9 @@ import {
 export class FileUploadService {
   constructor(private prisma: PrismaService) {}
 
-   randomNum(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min; // You can remove the Math.floor if you don't want it to be an integer
+  randomNum(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
   }
-
 
   async createFile({ file }: CreateFileInput): Promise<Resources> {
     const { createReadStream, filename } = file;
@@ -31,7 +30,10 @@ export class FileUploadService {
         filename,
       );
     } catch (error) {
-      throw new HttpException(`Could not save image, ${error.message}`, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        `Could not save image, ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
